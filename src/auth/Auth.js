@@ -23,13 +23,26 @@ router.get("/:id", async (req, res) => {
 });
 
 /** Create new users */
-router.post("/", async (req, res) => {
-  try {
-    
-    const { firstName, lastName, email, password} = req.body;
+router.post("/", async (req, res, next) => {
+  
+  const {email, password} = req.body;
+  if(password.lenghth < 6){
+    return res.status(401).send("The password needs 6 or more characteres")
+  }
+    try {
+    const { firstName, lastName, email, password } = req.body;
 
-    const user = await UserModel.create(datas);
-    res.status(200).json(user);
+    const user = await UserModel.create({
+      firstName,
+      lastName,
+      email,
+      password,
+    }).then((user) =>
+      res.status(201).json({
+        message: "User created successfully",
+        user,
+      })
+    );
   } catch (error) {
     res.status(500).send(error.message);
   }
